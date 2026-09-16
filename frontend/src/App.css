@@ -1,0 +1,1035 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  color: #30271f;
+}
+
+button {
+  font: inherit;
+}
+
+
+/* =========================================================
+   APP
+   ========================================================= */
+
+.app {
+  position: relative;
+
+  width: 100%;
+  height: 100vh;
+
+  min-height: 617px;
+
+  overflow: hidden;
+
+  background: #d9cbbd;
+}
+
+
+/* =========================================================
+   GIF BACKGROUND
+   ========================================================= */
+
+.reference-scene {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  z-index: 0;
+
+  /*
+   * Slightly slow visual transition when
+   * changing between mood environments.
+   */
+  transform: scale(1.01);
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   ATMOSPHERE OVERLAY
+   ========================================================= */
+
+.atmosphere {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 1;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 248, 238, 0.04),
+      rgba(45, 30, 20, 0.08)
+    );
+
+  transition:
+    background 0.8s ease,
+    opacity 0.8s ease;
+}
+
+
+/* =========================================================
+   MOOD ATMOSPHERES
+   ========================================================= */
+
+.app.mood-talk .atmosphere {
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 248, 238, 0.02),
+      rgba(255, 238, 215, 0.04)
+    );
+}
+
+.app.mood-vent .atmosphere {
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(54, 76, 87, 0.12),
+      rgba(39, 51, 59, 0.12)
+    );
+}
+
+.app.mood-understand .atmosphere {
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(184, 204, 194, 0.06),
+      rgba(90, 115, 103, 0.08)
+    );
+}
+
+.app.mood-advice .atmosphere {
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(224, 160, 103, 0.07),
+      rgba(163, 96, 53, 0.05)
+    );
+}
+
+.app.mood-fun .atmosphere {
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 207, 120, 0.08),
+      rgba(231, 151, 84, 0.05)
+    );
+}
+
+
+/* =========================================================
+   ENVIRONMENT DEBUG PANEL
+   ========================================================= */
+
+.environment-debug {
+  position: fixed;
+
+  top: 20px;
+  left: 20px;
+
+  z-index: 9999;
+
+  width: 270px;
+
+  padding: 18px;
+
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.94);
+
+  color: #222;
+
+  box-shadow:
+    0 15px 45px rgba(0, 0, 0, 0.18);
+
+  backdrop-filter: blur(15px);
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  font-size: 13px;
+}
+
+.environment-debug-title {
+  margin-bottom: 12px;
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  text-align: center;
+}
+
+.environment-debug > div:not(.environment-debug-title):not(.environment-debug-buttons) {
+  margin-top: 5px;
+}
+
+.environment-debug-buttons {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 5px;
+
+  margin-top: 13px;
+}
+
+.environment-debug-buttons button {
+  border: 0;
+
+  padding: 7px 9px;
+
+  border-radius: 7px;
+
+  background: #4a4642;
+
+  color: white;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.environment-debug-buttons button:hover {
+  transform: translateY(-1px);
+
+  background: #302b27;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.header {
+  position: absolute;
+
+  inset: 0 0 auto 0;
+
+  height: 70px;
+
+  display: flex;
+
+  align-items: center;
+
+  padding: 0 3.2%;
+
+  z-index: 20;
+}
+
+.brand-mini {
+  font-size: 24px;
+
+  letter-spacing: -1.5px;
+
+  color: #211b17;
+
+  text-shadow:
+    0 1px 12px rgba(255, 255, 255, 0.35);
+}
+
+.brand-mini b {
+  font-weight: 800;
+}
+
+.divider {
+  height: 22px;
+
+  width: 1px;
+
+  background: rgba(55, 43, 32, 0.25);
+
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+.tagline {
+  font-family: Georgia, serif;
+
+  font-style: italic;
+
+  font-size: 13px;
+
+  color: rgba(58, 45, 34, 0.7);
+}
+
+.header-right {
+  margin-left: auto;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+}
+
+.ambient {
+  border: 0;
+
+  border-radius: 22px;
+
+  padding: 10px 14px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  color: #f7eee6;
+
+  background: rgba(45, 29, 19, 0.88);
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 30px rgba(50, 30, 20, 0.18);
+
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease;
+}
+
+.ambient:hover {
+  transform: translateY(-2px);
+
+  background: rgba(45, 29, 19, 0.95);
+}
+
+.chevron {
+  opacity: 0.6;
+}
+
+.time {
+  font-size: 13px;
+
+  color: #342920;
+
+  font-weight: 600;
+
+  text-shadow:
+    0 1px 10px rgba(255, 255, 255, 0.4);
+}
+
+.date {
+  margin-left: -7px;
+
+  margin-top: 20px;
+
+  position: absolute;
+
+  right: 7.5%;
+
+  font-size: 10px;
+
+  color: rgba(53, 42, 32, 0.62);
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+
+  display: grid;
+
+  place-items: center;
+
+  background: #3a2a1f;
+
+  color: #f6eee6;
+
+  border: 3px solid rgba(255, 255, 255, 0.45);
+}
+
+
+/* =========================================================
+   CENTER
+   ========================================================= */
+
+.center {
+  position: absolute;
+
+  z-index: 10;
+
+  left: 50%;
+  top: 49%;
+
+  transform:
+    translate(-50%, -50%);
+
+  width:
+    min(620px, 52vw);
+
+  text-align: center;
+}
+
+.presence {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 9px;
+
+  font-size: 10px;
+
+  letter-spacing: 3px;
+
+  color: rgba(56, 43, 32, 0.72);
+
+  text-shadow:
+    0 1px 12px rgba(255, 255, 255, 0.45);
+}
+
+.presence span {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: #b76d3e;
+
+  box-shadow:
+    0 0 12px rgba(183, 109, 62, 0.45);
+}
+
+.ustalk-wordmark {
+  margin-top: 25px;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(68px, 7vw, 98px);
+
+  line-height: 0.9;
+
+  letter-spacing: -6px;
+
+  color: #241b16;
+
+  text-shadow:
+    0 8px 25px rgba(255, 255, 255, 0.18),
+    0 8px 25px rgba(66, 43, 28, 0.12);
+}
+
+.ustalk-wordmark span {
+  font-weight: 800;
+}
+
+.conversation {
+  margin-top: 28px;
+}
+
+.mood-line {
+  font-family: Georgia, serif;
+
+  font-style: italic;
+
+  font-size: 18px;
+
+  color: #a96d4a;
+
+  margin-bottom: 8px;
+
+  text-shadow:
+    0 1px 12px rgba(255, 255, 255, 0.25);
+}
+
+.conversation h1 {
+  margin: 0;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-weight: 400;
+
+  font-size:
+    clamp(31px, 3vw, 43px);
+
+  letter-spacing: -1.5px;
+
+  color: #30251e;
+
+  text-shadow:
+    0 2px 15px rgba(255, 255, 255, 0.2);
+}
+
+.talk-button {
+  margin-top: 23px;
+
+  border: 0;
+
+  border-radius: 999px;
+
+  height: 67px;
+
+  min-width: 225px;
+
+  padding: 7px 24px 7px 7px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 13px;
+
+  color: #352920;
+
+  background:
+    rgba(255, 249, 241, 0.9);
+
+  box-shadow:
+    0 15px 45px rgba(80, 52, 32, 0.18);
+
+  cursor: pointer;
+
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.talk-button:hover {
+  background:
+    rgba(255, 252, 247, 0.97);
+
+  box-shadow:
+    0 18px 50px rgba(80, 52, 32, 0.23);
+}
+
+.mic {
+  width: 53px;
+  height: 53px;
+
+  border-radius: 50%;
+
+  display: grid;
+
+  place-items: center;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      145deg,
+      #dc9a64,
+      #b96d45
+    );
+
+  box-shadow:
+    0 7px 25px rgba(185, 106, 65, 0.3);
+}
+
+.listening .mic {
+  animation:
+    pulse 1.15s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    transform: scale(1.09);
+
+    box-shadow:
+      0 0 35px rgba(185, 106, 65, 0.5);
+  }
+}
+
+.no-pressure {
+  margin-top: 12px;
+
+  font-size: 9px;
+
+  letter-spacing: 2.5px;
+
+  color: rgba(52, 40, 31, 0.42);
+}
+
+
+/* =========================================================
+   SCENE CONTROLS
+   ========================================================= */
+
+.scene-control {
+  position: absolute;
+
+  z-index: 15;
+
+  border: 0;
+
+  cursor: pointer;
+
+  color: #f7eee5;
+
+  background:
+    rgba(45, 31, 22, 0.83);
+
+  box-shadow:
+    0 10px 30px rgba(54, 37, 25, 0.15);
+
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease;
+}
+
+.scene-control:hover {
+  transform: translateY(-3px);
+
+  background:
+    rgba(45, 31, 22, 0.94);
+}
+
+.weather-control {
+  left: 20%;
+
+  top: 18%;
+
+  border-radius: 28px;
+
+  padding: 7px 15px 7px 7px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+.light-control {
+  right: 19%;
+
+  top: 28%;
+
+  border-radius: 24px;
+
+  padding: 6px 12px 6px 6px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  text-align: left;
+
+  line-height: 1.1;
+}
+
+.music-control {
+  right: 8%;
+
+  bottom: 35%;
+
+  border-radius: 24px;
+
+  padding: 7px 12px 7px 7px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  text-align: left;
+
+  line-height: 1.1;
+}
+
+.control-icon {
+  width: 38px;
+  height: 38px;
+
+  border-radius: 50%;
+
+  display: grid;
+
+  place-items: center;
+
+  color: white;
+
+  background: #d69a4f;
+}
+
+.control-icon.small {
+  width: 34px;
+  height: 34px;
+
+  background: #38281e;
+
+  color: #f3d6b5;
+}
+
+
+/* =========================================================
+   MOOD SELECTOR — MINIMAL
+   ========================================================= */
+
+.mood-bar {
+  position: absolute;
+
+  z-index: 20;
+
+  left: 50%;
+  bottom: 5%;
+
+  transform: translateX(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  padding: 7px 10px;
+
+  width: auto;
+  min-height: auto;
+
+  border-radius: 999px;
+
+  background: rgba(248, 240, 231, 0.58);
+
+  box-shadow:
+    0 10px 35px rgba(55, 38, 25, 0.12);
+
+  backdrop-filter: blur(16px);
+}
+
+.mood-bar button {
+  position: relative;
+
+  border: 0;
+
+  border-radius: 999px;
+
+  background: transparent;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 9px 13px;
+
+  color: rgba(54, 43, 35, 0.58);
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition:
+    color 0.3s ease,
+    background 0.3s ease,
+    transform 0.25s ease;
+}
+
+.mood-bar button:hover {
+  color: #38291f;
+
+  background: rgba(255, 255, 255, 0.38);
+
+  transform: translateY(-1px);
+}
+
+.mood-bar button.active {
+  color: #302219;
+
+  background: rgba(255, 255, 255, 0.72);
+
+  box-shadow:
+    0 5px 18px rgba(60, 42, 28, 0.08);
+}
+
+.mood-bar button svg {
+  width: 16px;
+  height: 16px;
+
+  stroke-width: 1.7;
+}
+
+.mood-bar button strong {
+  display: block;
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+
+  font-size: 11px;
+
+  font-weight: 500;
+
+  letter-spacing: 0.01em;
+}
+
+/*
+ * Hide the explanatory descriptions.
+ *
+ * The mood name is enough.
+ */
+.mood-bar button small {
+  display: none;
+}
+
+
+/* =========================================================
+   MOOD ACTIVE INDICATOR
+   ========================================================= */
+
+.mood-bar button.active::after {
+  content: "";
+
+  position: absolute;
+
+  bottom: 3px;
+  left: 50%;
+
+  width: 4px;
+  height: 4px;
+
+  border-radius: 50%;
+
+  background: #b86e46;
+
+  transform: translateX(-50%);
+}
+
+/* =========================================================
+   COFFEE
+   ========================================================= */
+
+.coffee-control {
+  position: absolute;
+
+  z-index: 15;
+
+  right: 25%;
+
+  bottom: 17%;
+
+  width: 52px;
+  height: 52px;
+
+  border: 0;
+
+  border-radius: 16px;
+
+  background:
+    rgba(247, 239, 229, 0.86);
+
+  color: #71543e;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 12px 30px rgba(67, 46, 31, 0.12);
+
+  transition:
+    transform 0.25s ease;
+}
+
+.coffee-control:hover {
+  transform:
+    translateY(-3px);
+}
+
+
+/* =========================================================
+   CORNER DETAILS
+   ========================================================= */
+
+.corner-note {
+  position: absolute;
+
+  z-index: 12;
+
+  bottom: 4%;
+
+  font-size: 8px;
+
+  letter-spacing: 1.2px;
+
+  color:
+    rgba(255, 247, 238, 0.78);
+
+  text-shadow:
+    0 1px 8px rgba(0, 0, 0, 0.2);
+}
+
+.corner-note.left {
+  left: 2.8%;
+}
+
+.corner-note.right {
+  right: 3.2%;
+}
+
+
+/* =========================================================
+   LIGHTING ATMOSPHERE
+   ========================================================= */
+
+.app.light-day .atmosphere {
+  opacity: 0.65;
+}
+
+.app.light-warm .atmosphere {
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 218, 170, 0.04),
+      rgba(130, 76, 38, 0.06)
+    );
+}
+
+.app.light-soft .atmosphere {
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(100, 115, 125, 0.08),
+      rgba(60, 70, 78, 0.1)
+    );
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .tagline,
+  .divider,
+  .date {
+    display: none;
+  }
+
+  .header {
+    padding: 0 18px;
+  }
+
+  .center {
+    width: 80vw;
+  }
+
+  .mood-bar {
+    width: 92vw;
+
+    overflow-x: auto;
+  }
+
+  
+
+  .weather-control {
+    left: 4%;
+  }
+
+  .light-control {
+    right: 4%;
+  }
+}
+
+@media (max-width: 650px) {
+  .environment-debug {
+    transform: scale(0.85);
+
+    transform-origin:
+      top left;
+  }
+
+  .center {
+    top: 44%;
+  }
+
+  .ustalk-wordmark {
+    font-size: 62px;
+  }
+
+  .conversation h1 {
+    font-size: 28px;
+  }
+
+  .scene-control span:not(.control-icon) {
+    font-size: 0;
+  }
+
+  .weather-control {
+    left: 4%;
+  }
+
+  .light-control {
+    right: 4%;
+  }
+
+  .music-control {
+    right: 4%;
+
+    bottom: 25%;
+  }
+}
+
+@media (max-width: 900px) {
+  .mood-bar {
+    max-width: 92vw;
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+
+  .mood-bar button {
+    flex-shrink: 0;
+  }
+}
+.app.light-calm .atmosphere {
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(210, 220, 215, 0.08),
+      rgba(80, 100, 92, 0.1)
+    );
+}
