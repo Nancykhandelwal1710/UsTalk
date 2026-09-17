@@ -1,0 +1,22 @@
+.conversation {
+  width: min(520px, 80vw);
+  margin: 20px auto 0;
+  text-align: center;
+}
+
+.conversation-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.conversation-text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 400;
+  opacity: 0.85;
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSpeechRecognition } from "./hooks/useSpeechRecognition";
 import VoiceButton from "./components/Voice/VoiceButton";
+import Conversation from "./components/Conversation/Conversation";
 import { DEFAULT_ENVIRONMENT, moodProfiles, } from "./environment";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -309,30 +310,11 @@ export default function App() {
   onToggle={toggleListening}
 />
 
-          {transcript && (
-  <motion.div
-    className="transcript"
-    initial={{ opacity: 0, y: 6 }}
-    animate={{ opacity: 1, y: 0 }}
-  >
-    {transcript}
-  </motion.div>
-)}
+          <Conversation transcript={transcript} />
 <div className="no-pressure">
             NO PRESSURE. JUST TALK.
           </div>
         </section>
-
-        {/* ===================================================
-            COFFEE
-            =================================================== */}
-
-        <button
-          className="coffee-control"
-          onClick={() => changeMood("talk")}
-        >
-          <span>☕</span>
-        </button>
 
         {/* ===================================================
             MOOD BAR
