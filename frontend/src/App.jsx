@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useSpeechRecognition } from "./hooks/useSpeechRecognition";
 import { DEFAULT_ENVIRONMENT, moodProfiles, } from "./environment";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -67,55 +68,11 @@ export default function App() {
    * Voice state
    */
 
-  const [listening, setListening] = useState(false);
-  const [transcript, setTranscript] = useState("");
-  const recognitionRef = useRef(null);
-  useEffect(() => {
-  const SpeechRecognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
-
-  if (!SpeechRecognition) {
-    console.warn("Speech Recognition is not supported.");
-    return;
-  }
-
-  const recognition = new SpeechRecognition();
-
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.lang = "en-IN";
-
-  recognitionRef.current = recognition;
-
-  recognition.onresult = (event) => {
-  let finalText = "";
-
-  for (
-    let i = event.resultIndex;
-    i < event.results.length;
-    i++
-  ) {
-    if (event.results[i].isFinal) {
-      finalText += event.results[i][0].transcript;
-    }
-  }
-
-  if (finalText) {
-    setTranscript((prev) =>
-      `${prev} ${finalText}`.trim()
-    );
-  }
-};
-recognition.onend = () => {
-  setListening(false);
-};
-
-  return () => {
-    recognition.stop();
-    recognitionRef.current = null;
-  };
-}, []);
+  const {
+  listening,
+  transcript,
+  toggleListening,
+} = useSpeechRecognition();
   /*
    * Current clock
    */
@@ -348,28 +305,7 @@ recognition.onend = () => {
 
           <motion.button
             className="talk-button"
-            onClick={() => {
-  if (!recognitionRef.current) {
-    alert(
-      "Speech recognition is not supported in this browser."
-    );
-    return;
-  }
-
-  if (listening) {
-    recognitionRef.current.stop();
-    setListening(false);
-  } else {
-    setTranscript("");
-
-    try {
-      recognitionRef.current.start();
-      setListening(true);
-    } catch (error) {
-      console.error("Speech recognition error:", error);
-    }
-  }
-}}
+            onClick={toggleListening}
             whileHover={{
               scale: 1.035,
             }}
