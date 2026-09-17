@@ -73,7 +73,7 @@ export default function App() {
 
   const {
   listening,
-  transcript,
+  liveTranscript,
   finalTranscript,
   toggleListening,
 } = useSpeechRecognition();

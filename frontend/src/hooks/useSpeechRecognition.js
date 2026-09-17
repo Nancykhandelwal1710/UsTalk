@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 export function useSpeechRecognition() {
   const [listening, setListening] = useState(false);
-  const [transcript, setTranscript] = useState("");
+  const [liveTranscript, setLiveTranscript] = useState("");
   const [finalTranscript, setFinalTranscript] = useState("");
 
   const recognitionRef = useRef(null);
@@ -26,6 +26,7 @@ export function useSpeechRecognition() {
     recognitionRef.current = recognition;
 
     recognition.onresult = (event) => {
+      let interimText = "";
       let finalText = "";
 
       for (
@@ -33,18 +34,25 @@ export function useSpeechRecognition() {
         i < event.results.length;
         i++
       ) {
+        const text = event.results[i][0].transcript;
+
         if (event.results[i].isFinal) {
-          finalText += event.results[i][0].transcript;
+          finalText += text;
+        } else {
+          interimText += text;
         }
       }
 
-      if (finalText) {
-  setTranscript((prev) =>
-    `${prev} ${finalText}`.trim()
-  );
+      if (interimText) {
+        setLiveTranscript(interimText.trim());
+      }
 
-  setFinalTranscript(finalText.trim());
-}
+      if (finalText) {
+        const cleanedText = finalText.trim();
+
+        setLiveTranscript("");
+        setFinalTranscript(cleanedText);
+      }
     };
 
     recognition.onend = () => {
@@ -65,7 +73,8 @@ export function useSpeechRecognition() {
       return;
     }
 
-    setTranscript("");
+    setLiveTranscript("");
+    setFinalTranscript("");
 
     try {
       recognitionRef.current.start();
@@ -80,6 +89,7 @@ export function useSpeechRecognition() {
 
     recognitionRef.current.stop();
     setListening(false);
+    setLiveTranscript("");
   };
 
   const toggleListening = () => {
@@ -91,11 +101,11 @@ export function useSpeechRecognition() {
   };
 
   return {
-  listening,
-  transcript,
-  finalTranscript,
-  startListening,
-  stopListening,
-  toggleListening,
-};
+    listening,
+    liveTranscript,
+    finalTranscript,
+    startListening,
+    stopListening,
+    toggleListening,
+  };
 }
