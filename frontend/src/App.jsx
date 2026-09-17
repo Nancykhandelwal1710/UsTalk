@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSpeechRecognition } from "./hooks/useSpeechRecognition";
+import VoiceButton from "./components/Voice/VoiceButton";
 import { DEFAULT_ENVIRONMENT, moodProfiles, } from "./environment";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -303,26 +304,10 @@ export default function App() {
             </motion.div>
           </AnimatePresence>
 
-          <motion.button
-            className="talk-button"
-            onClick={toggleListening}
-            whileHover={{
-              scale: 1.035,
-            }}
-            whileTap={{
-              scale: 0.97,
-            }}
-          >
-            <span className="mic">
-              <Mic size={22} />
-            </span>
-
-            <span>
-              {listening
-                ? "Listening..."
-                : "Start talking"}
-            </span>
-          </motion.button>
+          <VoiceButton
+  listening={listening}
+  onToggle={toggleListening}
+/>
 
           {transcript && (
   <motion.div
