@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 export function useSpeechRecognition() {
   const [listening, setListening] = useState(false);
   const [transcript, setTranscript] = useState("");
+  const [finalTranscript, setFinalTranscript] = useState("");
 
   const recognitionRef = useRef(null);
 
@@ -38,10 +39,12 @@ export function useSpeechRecognition() {
       }
 
       if (finalText) {
-        setTranscript((prev) =>
-          `${prev} ${finalText}`.trim()
-        );
-      }
+  setTranscript((prev) =>
+    `${prev} ${finalText}`.trim()
+  );
+
+  setFinalTranscript(finalText.trim());
+}
     };
 
     recognition.onend = () => {
@@ -88,10 +91,11 @@ export function useSpeechRecognition() {
   };
 
   return {
-    listening,
-    transcript,
-    startListening,
-    stopListening,
-    toggleListening,
-  };
+  listening,
+  transcript,
+  finalTranscript,
+  startListening,
+  stopListening,
+  toggleListening,
+};
 }

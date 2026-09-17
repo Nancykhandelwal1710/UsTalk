@@ -65,6 +65,7 @@ export default function App() {
   const [environment, setEnvironment] = useState(
     DEFAULT_ENVIRONMENT
   );
+  const [messages, setMessages] = useState([]);
 
   /*
    * Voice state
@@ -73,8 +74,23 @@ export default function App() {
   const {
   listening,
   transcript,
+  finalTranscript,
   toggleListening,
 } = useSpeechRecognition();
+
+useEffect(() => {
+  if (!finalTranscript) return;
+
+  setMessages((prev) => [
+    ...prev,
+    {
+      id: crypto.randomUUID(),
+      role: "user",
+      content: finalTranscript,
+    },
+  ]);
+}, [finalTranscript]);
+
   /*
    * Current clock
    */
@@ -310,19 +326,7 @@ export default function App() {
   onToggle={toggleListening}
 />
 
-          <Conversation
-  messages={
-    transcript
-      ? [
-          {
-            id: "current-user-message",
-            role: "user",
-            content: transcript,
-          },
-        ]
-      : []
-  }
-/>
+          <Conversation messages={messages} />
 <div className="no-pressure">
             NO PRESSURE. JUST TALK.
           </div>
