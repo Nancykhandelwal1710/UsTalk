@@ -4,6 +4,10 @@
   text-align: center;
 }
 
+.conversation-message {
+  margin-bottom: 16px;
+}
+
 .conversation-label {
   display: block;
   margin-bottom: 6px;
@@ -19,4 +23,8 @@
   line-height: 1.6;
   font-weight: 400;
   opacity: 0.85;
+}
+
+.conversation-message.assistant .conversation-text {
+  opacity: 0.7;
 }

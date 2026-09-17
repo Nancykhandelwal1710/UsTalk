@@ -310,7 +310,19 @@ export default function App() {
   onToggle={toggleListening}
 />
 
-          <Conversation transcript={transcript} />
+          <Conversation
+  messages={
+    transcript
+      ? [
+          {
+            id: "current-user-message",
+            role: "user",
+            content: transcript,
+          },
+        ]
+      : []
+  }
+/>
 <div className="no-pressure">
             NO PRESSURE. JUST TALK.
           </div>
