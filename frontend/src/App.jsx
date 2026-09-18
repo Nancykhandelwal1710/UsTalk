@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSpeechRecognition } from "./hooks/useSpeechRecognition";
 import VoiceButton from "./components/Voice/VoiceButton";
 import Conversation from "./components/Conversation/Conversation";
+import { sendMessage } from "./services/aiService";
 import { DEFAULT_ENVIRONMENT, moodProfiles, } from "./environment";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -81,14 +82,28 @@ export default function App() {
 useEffect(() => {
   if (!finalTranscript) return;
 
-  setMessages((prev) => [
-    ...prev,
-    {
-      id: crypto.randomUUID(),
-      role: "user",
-      content: finalTranscript,
-    },
-  ]);
+  const userMessage = {
+    id: crypto.randomUUID(),
+    role: "user",
+    content: finalTranscript,
+  };
+
+  setMessages((prev) => [...prev, userMessage]);
+
+  sendMessage(finalTranscript, messages)
+    .then((response) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: response.content,
+        },
+      ]);
+    })
+    .catch((error) => {
+      console.error("UsTalk AI error:", error);
+    });
 }, [finalTranscript]);
 
   /*
