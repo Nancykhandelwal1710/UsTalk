@@ -1,3 +1,4 @@
+const { generateResponse } = require("./ai/aiProvider");
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -14,17 +15,28 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-app.post("/api/chat", (req, res) => {
-  const { message, conversationHistory = [] } = req.body;
+app.post("/api/chat", async (req, res) => {
+  try {
+    const { message, conversationHistory = [] } = req.body;
 
-  console.log("Chat request received:");
-  console.log("Message:", message);
-  console.log("History:", conversationHistory);
+    console.log("Chat request received:");
+    console.log("Message:", message);
+    console.log("History:", conversationHistory);
 
-  res.json({
-    role: "assistant",
-    content: "I received your message. AI will be connected here.",
-  });
+    const response = await generateResponse(
+      message,
+      conversationHistory
+    );
+
+    res.json(response);
+  } catch (error) {
+    console.error("AI response error:", error);
+
+    res.status(500).json({
+      role: "assistant",
+      content: "Something went wrong while processing your message.",
+    });
+  }
 });
 
 const PORT = process.env.PORT || 5000;
