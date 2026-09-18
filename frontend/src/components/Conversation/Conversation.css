@@ -1,27 +1,45 @@
 .conversation {
   width: min(520px, 80vw);
-  margin: 20px auto 0;
+  max-height: 180px;
+  margin: 18px auto 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
   text-align: center;
+
+  padding: 8px 14px;
+  box-sizing: border-box;
+
+  scrollbar-width: thin;
 }
 
 .conversation-message {
   margin-bottom: 16px;
 }
 
+.conversation-message:last-child {
+  margin-bottom: 0;
+}
+
 .conversation-label {
   display: block;
   margin-bottom: 6px;
+
   font-size: 10px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+
   opacity: 0.55;
 }
 
 .conversation-text {
   margin: 0;
+
   font-size: 16px;
   line-height: 1.6;
   font-weight: 400;
+
   opacity: 0.85;
 }
 
