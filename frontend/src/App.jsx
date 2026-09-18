@@ -3,7 +3,7 @@ import { useSpeechRecognition } from "./hooks/useSpeechRecognition";
 import VoiceButton from "./components/Voice/VoiceButton";
 import Conversation from "./components/Conversation/Conversation";
 import { sendMessage } from "./services/aiService";
-import { DEFAULT_ENVIRONMENT, moodProfiles, } from "./environment";
+import { DEFAULT_ENVIRONMENT, moodProfiles } from "./environment";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Mic,
@@ -66,6 +66,7 @@ export default function App() {
   const [environment, setEnvironment] = useState(
     DEFAULT_ENVIRONMENT
   );
+
   const [messages, setMessages] = useState([]);
 
   /*
@@ -73,73 +74,99 @@ export default function App() {
    */
 
   const {
-  listening,
-  liveTranscript,
-  finalTranscript,
-  toggleListening,
-} = useSpeechRecognition();
-
-useEffect(() => {
-  if (!finalTranscript) return;
-
-  const userMessage = {
-    id: crypto.randomUUID(),
-    role: "user",
-    content: finalTranscript,
-  };
-
-  const assistantMessageId = crypto.randomUUID();
-
-  setMessages((prev) => [
-    ...prev,
-    userMessage,
-    {
-      id: assistantMessageId,
-      role: "assistant",
-      content: "",
-    },
-  ]);
-
-  const conversationHistory = [
-    ...messages,
-    userMessage,
-  ];
-
-  sendMessage(
+    listening,
+    liveTranscript,
     finalTranscript,
-    conversationHistory,
-    (_chunk, fullResponse) => {
-      setMessages((prev) =>
-        prev.map((item) =>
-          item.id === assistantMessageId
-            ? {
-                ...item,
-                content: fullResponse,
-              }
-            : item
-        )
-      );
-    }
-  )
-    .catch((error) => {
-      console.error("UsTalk AI error:", error);
-
-      setMessages((prev) =>
-        prev.map((item) =>
-          item.id === assistantMessageId
-            ? {
-                ...item,
-                content:
-                  "Sorry, I couldn't respond right now.",
-              }
-            : item
-        )
-      );
-    });
-}, [finalTranscript]);
+    toggleListening,
+  } = useSpeechRecognition();
 
   /*
-   * Current clock
+   * =========================================================
+   * AI RESPONSE + VOICE
+   * =========================================================
+   */
+
+  useEffect(() => {
+    if (!finalTranscript) return;
+
+    const userMessage = {
+      id: crypto.randomUUID(),
+      role: "user",
+      content: finalTranscript,
+    };
+
+    const assistantMessageId = crypto.randomUUID();
+
+    setMessages((prev) => [
+      ...prev,
+      userMessage,
+      {
+        id: assistantMessageId,
+        role: "assistant",
+        content: "",
+      },
+    ]);
+
+    const conversationHistory = [
+      ...messages,
+      userMessage,
+    ];
+
+    sendMessage(
+      finalTranscript,
+      conversationHistory,
+      (_chunk, fullResponse) => {
+        setMessages((prev) =>
+          prev.map((item) =>
+            item.id === assistantMessageId
+              ? {
+                  ...item,
+                  content: fullResponse,
+                }
+              : item
+          )
+        );
+      }
+    )
+      .then((response) => {
+        if (
+          response.content &&
+          "speechSynthesis" in window
+        ) {
+          window.speechSynthesis.cancel();
+
+          const speech = new SpeechSynthesisUtterance(
+            response.content
+          );
+
+          speech.rate = 0.95;
+          speech.pitch = 1;
+          speech.volume = 1;
+
+          window.speechSynthesis.speak(speech);
+        }
+      })
+      .catch((error) => {
+        console.error("UsTalk AI error:", error);
+
+        setMessages((prev) =>
+          prev.map((item) =>
+            item.id === assistantMessageId
+              ? {
+                  ...item,
+                  content:
+                    "Sorry, I couldn't respond right now.",
+                }
+              : item
+          )
+        );
+      });
+  }, [finalTranscript]);
+
+  /*
+   * =========================================================
+   * CURRENT CLOCK
+   * =========================================================
    */
 
   const [time, setTime] = useState("");
@@ -151,27 +178,20 @@ useEffect(() => {
    */
 
   const changeMood = (newMood) => {
-  const profile = moodProfiles[newMood];
+    const profile = moodProfiles[newMood];
 
-  if (!profile) return;
+    if (!profile) return;
 
-  setEnvironment((env) => ({
-    ...env,
-
-    mood: newMood,
-
-    background: profile.background,
-
-    lighting: profile.lighting,
-
-    energy: profile.energy,
-
-    music: profile.music,
-
-    weather: profile.weather,
-  }));
-};
-
+    setEnvironment((env) => ({
+      ...env,
+      mood: newMood,
+      background: profile.background,
+      lighting: profile.lighting,
+      energy: profile.energy,
+      music: profile.music,
+      weather: profile.weather,
+    }));
+  };
 
   /*
    * =========================================================
@@ -212,12 +232,6 @@ useEffect(() => {
    * =========================================================
    * MOOD → GIF BACKGROUND
    * =========================================================
-   *
-   * These files are inside:
-   *
-   * frontend/public/
-   *
-   * The mood decides which environment GIF is displayed.
    */
 
   const currentBackground =
@@ -233,7 +247,6 @@ useEffect(() => {
   const currentMood =
     moods.find((m) => m.id === mood) || moods[0];
 
-  
   /*
    * =========================================================
    * DEBUG
@@ -244,11 +257,6 @@ useEffect(() => {
 
   return (
     <>
-
-      {/* =====================================================
-          MAIN APP
-          ===================================================== */}
-
       <main
         className={`
           app
@@ -258,33 +266,27 @@ useEffect(() => {
           ${listening ? "listening" : ""}
         `}
       >
-        {/* ===================================================
-            ACTUAL GIF BACKGROUND
-            =================================================== */}
         <AnimatePresence mode="sync">
-        <motion.div
-          key={currentBackground}
-          className="reference-scene"
-          aria-hidden="true"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ opacity: { duration: 1.2, ease: "easeInOut", }, }}
-          style={{
-            backgroundImage: `url("${currentBackground}")`,
-          }}
-        />
+          <motion.div
+            key={currentBackground}
+            className="reference-scene"
+            aria-hidden="true"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              opacity: {
+                duration: 1.2,
+                ease: "easeInOut",
+              },
+            }}
+            style={{
+              backgroundImage: `url("${currentBackground}")`,
+            }}
+          />
         </AnimatePresence>
 
-        {/* ===================================================
-            BACKGROUND ATMOSPHERE
-            =================================================== */}
-
         <div className="atmosphere" />
-
-        {/* ===================================================
-            HEADER
-            =================================================== */}
 
         <header className="header">
           <div className="brand-mini">
@@ -298,8 +300,6 @@ useEffect(() => {
           </div>
 
           <div className="header-right">
-            
-
             <div className="time">
               {time}
             </div>
@@ -313,13 +313,6 @@ useEffect(() => {
             </div>
           </div>
         </header>
-
-  
-
-        
-        {/* ===================================================
-            CENTER US TALK
-            =================================================== */}
 
         <section className="center">
           <div className="presence">
@@ -369,19 +362,16 @@ useEffect(() => {
           </AnimatePresence>
 
           <VoiceButton
-  listening={listening}
-  onToggle={toggleListening}
-/>
+            listening={listening}
+            onToggle={toggleListening}
+          />
 
           <Conversation messages={messages} />
-<div className="no-pressure">
+
+          <div className="no-pressure">
             NO PRESSURE. JUST TALK.
           </div>
         </section>
-
-        {/* ===================================================
-            MOOD BAR
-            =================================================== */}
 
         <nav className="mood-bar">
           {moods.map((item) => {
@@ -452,10 +442,6 @@ useEffect(() => {
             );
           })}
         </nav>
-
-        {/* ===================================================
-            CORNER DETAILS
-            =================================================== */}
 
         <div className="corner-note left">
           GOOD
