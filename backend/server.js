@@ -1,7 +1,8 @@
-const { generateResponse } = require("./ai/aiProvider");
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+
+const { generateResponse } = require("./ai/aiProvider");
 
 const app = express();
 
@@ -23,19 +24,45 @@ app.post("/api/chat", async (req, res) => {
     console.log("Message:", message);
     console.log("History:", conversationHistory);
 
-    const response = await generateResponse(
+    const stream = await generateResponse(
       message,
       conversationHistory
     );
 
-    res.json(response);
+    res.setHeader("Content-Type", "application/x-ndjson");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    const reader = stream.getReader();
+    const decoder = new TextDecoder();
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) break;
+
+        const chunk = decoder.decode(value, {
+          stream: true,
+        });
+
+        res.write(chunk);
+      }
+    } finally {
+      reader.releaseLock();
+    }
+
+    res.end();
   } catch (error) {
     console.error("AI response error:", error);
 
-    res.status(500).json({
-      role: "assistant",
-      content: "Something went wrong while processing your message.",
-    });
+    if (!res.headersSent) {
+      res.status(500).json({
+        error: "Something went wrong while processing your message.",
+      });
+    } else {
+      res.end();
+    }
   }
 });
 

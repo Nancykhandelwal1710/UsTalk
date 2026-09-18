@@ -88,21 +88,53 @@ useEffect(() => {
     content: finalTranscript,
   };
 
-  setMessages((prev) => [...prev, userMessage]);
+  const assistantMessageId = crypto.randomUUID();
 
-  sendMessage(finalTranscript, messages)
-    .then((response) => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          role: "assistant",
-          content: response.content,
-        },
-      ]);
-    })
+  setMessages((prev) => [
+    ...prev,
+    userMessage,
+    {
+      id: assistantMessageId,
+      role: "assistant",
+      content: "",
+    },
+  ]);
+
+  const conversationHistory = [
+    ...messages,
+    userMessage,
+  ];
+
+  sendMessage(
+    finalTranscript,
+    conversationHistory,
+    (_chunk, fullResponse) => {
+      setMessages((prev) =>
+        prev.map((item) =>
+          item.id === assistantMessageId
+            ? {
+                ...item,
+                content: fullResponse,
+              }
+            : item
+        )
+      );
+    }
+  )
     .catch((error) => {
       console.error("UsTalk AI error:", error);
+
+      setMessages((prev) =>
+        prev.map((item) =>
+          item.id === assistantMessageId
+            ? {
+                ...item,
+                content:
+                  "Sorry, I couldn't respond right now.",
+              }
+            : item
+        )
+      );
     });
 }, [finalTranscript]);
 

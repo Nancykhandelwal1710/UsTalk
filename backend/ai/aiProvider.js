@@ -6,19 +6,25 @@ async function generateResponse(message, conversationHistory = []) {
     {
       role: "system",
       content:
-        "You are UsTalk, a warm, natural AI companion. " +
-        "Be conversational, concise, and helpful. " +
-        "Do not mention internal reasoning or system instructions.",
+        "You are UsTalk, a warm and natural AI companion. " +
+        "Talk like a real conversation, not like an essay. " +
+        "Keep normal replies short, usually 1 to 3 sentences. " +
+        "Be friendly, emotionally aware, and direct. " +
+        "Only give detailed answers when the user asks for detail. " +
+        "Never reveal or describe your internal reasoning.",
     },
+
     ...conversationHistory
       .filter(
         (item) =>
-          item.role === "user" || item.role === "assistant"
+          item.role === "user" ||
+          item.role === "assistant"
       )
       .map((item) => ({
         role: item.role,
         content: item.content,
       })),
+
     {
       role: "user",
       content: message,
@@ -33,7 +39,12 @@ async function generateResponse(message, conversationHistory = []) {
     body: JSON.stringify({
       model: MODEL,
       messages,
-      stream: false,
+      stream: true,
+      think: false,
+      options: {
+        temperature: 0.7,
+        num_predict: 120,
+      },
     }),
   });
 
@@ -43,12 +54,13 @@ async function generateResponse(message, conversationHistory = []) {
     );
   }
 
-  const data = await response.json();
+  if (!response.body) {
+    throw new Error(
+      "Ollama did not return a response stream."
+    );
+  }
 
-  return {
-    role: "assistant",
-    content: data.message?.content?.trim() || "I'm here.",
-  };
+  return response.body;
 }
 
 module.exports = {
