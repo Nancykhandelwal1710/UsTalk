@@ -52,6 +52,11 @@ export function useSpeechRecognition() {
 
         setLiveTranscript("");
         setFinalTranscript(cleanedText);
+
+        // Stop listening once the user's turn is complete.
+        // This prevents UsTalk's own voice from being captured.
+        recognition.stop();
+        setListening(false);
       }
     };
 
