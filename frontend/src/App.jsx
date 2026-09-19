@@ -78,6 +78,7 @@ export default function App() {
     liveTranscript,
     finalTranscript,
     toggleListening,
+    startListening,
   } = useSpeechRecognition();
 
   /*
@@ -87,81 +88,90 @@ export default function App() {
    */
 
   useEffect(() => {
-    if (!finalTranscript) return;
+  if (!finalTranscript) return;
 
-    const userMessage = {
-      id: crypto.randomUUID(),
-      role: "user",
-      content: finalTranscript,
-    };
+  const userMessage = {
+    id: crypto.randomUUID(),
+    role: "user",
+    content: finalTranscript,
+  };
 
-    const assistantMessageId = crypto.randomUUID();
+  const assistantMessageId = crypto.randomUUID();
 
-    setMessages((prev) => [
-      ...prev,
-      userMessage,
-      {
-        id: assistantMessageId,
-        role: "assistant",
-        content: "",
-      },
-    ]);
+  setMessages((prev) => [
+    ...prev,
+    userMessage,
+    {
+      id: assistantMessageId,
+      role: "assistant",
+      content: "",
+    },
+  ]);
 
-    const conversationHistory = [
-      ...messages,
-      userMessage,
-    ];
+  const conversationHistory = [
+    ...messages,
+    userMessage,
+  ];
 
-    sendMessage(
-      finalTranscript,
-      conversationHistory,
-      (_chunk, fullResponse) => {
-        setMessages((prev) =>
-          prev.map((item) =>
-            item.id === assistantMessageId
-              ? {
-                  ...item,
-                  content: fullResponse,
-                }
-              : item
-          )
-        );
+  sendMessage(
+    finalTranscript,
+    conversationHistory,
+    (_chunk, fullResponse) => {
+      setMessages((prev) =>
+        prev.map((item) =>
+          item.id === assistantMessageId
+            ? {
+                ...item,
+                content: fullResponse,
+              }
+            : item
+        )
+      );
+    }
+  )
+    .then((response) => {
+      if (
+        response.content &&
+        "speechSynthesis" in window
+      ) {
+        window.speechSynthesis.cancel();
+
+        const speech =
+          new SpeechSynthesisUtterance(response.content);
+
+        speech.rate = 0.95;
+        speech.pitch = 1;
+        speech.volume = 1;
+
+        speech.onend = () => {
+          window.setTimeout(() => {
+            startListening();
+          }, 700);
+        };
+
+        window.speechSynthesis.speak(speech);
+      } else {
+        window.setTimeout(() => {
+          startListening();
+        }, 700);
       }
-    )
-      .then((response) => {
-        if (
-          response.content &&
-          "speechSynthesis" in window
-        ) {
-          window.speechSynthesis.cancel();
+    })
+    .catch((error) => {
+      console.error("UsTalk AI error:", error);
 
-          const speech = new SpeechSynthesisUtterance(
-            response.content
-          );
-
-          speech.rate = 0.95;
-          speech.pitch = 1;
-          speech.volume = 1;
-
-          window.speechSynthesis.speak(speech);
-        }
-      })
-      .catch((error) => {
-        console.error("UsTalk AI error:", error);
-
-        setMessages((prev) =>
-          prev.map((item) =>
-            item.id === assistantMessageId
-              ? {
-                  ...item,
-                  content:
-                    "Sorry, I couldn't respond right now.",
-                }
-              : item
-          )
-        );
-      });
-  }, [finalTranscript]);
+      setMessages((prev) =>
+        prev.map((item) =>
+          item.id === assistantMessageId
+            ? {
+                ...item,
+                content:
+                  "Sorry, I couldn't respond right now.",
+              }
+            : item
+        )
+      );
+    });
+}, [finalTranscript]);
 
   /*
    * =========================================================
